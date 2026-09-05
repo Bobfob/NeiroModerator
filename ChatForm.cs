@@ -1,6 +1,6 @@
 namespace NeiroModerator
 {
-    public partial class Form1 : Form
+    public partial class ChatForm : Form
     {
         private enum ModerationStatus
         {
@@ -30,9 +30,11 @@ namespace NeiroModerator
 
         private readonly Random random = new Random();
 
-        public Form1()
+        public ChatForm()
         {
             InitializeComponent();
+
+            lblCurrentUser.Text = "Пользователь: " + Session.Login;
 
             ShowInitialState();
             lblCounter.Text = "0 / 500";
@@ -75,8 +77,14 @@ namespace NeiroModerator
                 }
 
                 ModerationStatus status = GetModerationStatus(message);
-                ShowModerationResult(status);
+                int confidence = GetConfidence(status);
+                string statusText = GetStatusText(status);
+
+                ShowModerationResult(status, confidence);
+
+                Database.AddHistory(message, statusText, confidence);
             }
+
             catch (Exception)
             {
                 MessageBox.Show(
@@ -85,6 +93,7 @@ namespace NeiroModerator
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+            
             finally
             {
                 btnCheck.Enabled = true;
@@ -121,7 +130,7 @@ namespace NeiroModerator
             return false;
         }
 
-        private void ShowModerationResult(ModerationStatus status)
+        private void ShowModerationResult(ModerationStatus status, int confidence)
         {
             pnlConfidence.Visible = true;
             picStatus.Visible = true;
@@ -129,23 +138,21 @@ namespace NeiroModerator
             switch (status)
             {
                 case ModerationStatus.Safe:
-                    ShowSafeResult();
+                    ShowSafeResult(confidence);
                     break;
 
                 case ModerationStatus.Blocked:
-                    ShowBlockedResult();
+                    ShowBlockedResult(confidence);
                     break;
 
                 case ModerationStatus.Review:
-                    ShowReviewResult();
+                    ShowReviewResult(confidence);
                     break;
             }
         }
 
-        private void ShowSafeResult()
+        private void ShowSafeResult(int confidence)
         {
-            int confidence = random.Next(80, 101);
-
             pnlResult.BackColor = ColorTranslator.FromHtml("#101F22");
             pnlConfidence.BackColor = ColorTranslator.FromHtml("#142B29");
             lblResultTitle.ForeColor = ColorTranslator.FromHtml("#78A995");
@@ -160,10 +167,8 @@ namespace NeiroModerator
             picStatus.Image = Properties.Resources.status_safe;
         }
 
-        private void ShowBlockedResult()
+        private void ShowBlockedResult(int confidence)
         {
-            int confidence = random.Next(85, 101);
-
             pnlResult.BackColor = ColorTranslator.FromHtml("#25171D");
             pnlConfidence.BackColor = ColorTranslator.FromHtml("#321B23");
             lblResultTitle.ForeColor = ColorTranslator.FromHtml("#D58A96");
@@ -178,11 +183,8 @@ namespace NeiroModerator
             picStatus.Image = Properties.Resources.status_blocked;
         }
 
-        private void ShowReviewResult()
+        private void ShowReviewResult(int confidence)
         {
-            int confidence = random.Next(40, 80);
-
-            // Задаём жёлтые цвета ручной проверки.
             pnlResult.BackColor = ColorTranslator.FromHtml("#282314");
             pnlConfidence.BackColor = ColorTranslator.FromHtml("#342B15");
             lblResultTitle.ForeColor = ColorTranslator.FromHtml("#D8B768");
@@ -195,6 +197,36 @@ namespace NeiroModerator
             lblReason.Text = "Контекст сообщения неоднозначен";
             lblConfidence.Text = confidence + "%";
             picStatus.Image = Properties.Resources.status_review;
+        }
+
+        private int GetConfidence(ModerationStatus status)
+        {
+            switch (status)
+            {
+                case ModerationStatus.Safe:
+                    return random.Next(80, 101);
+
+                case ModerationStatus.Blocked:
+                    return random.Next(85, 101);
+
+                default:
+                    return random.Next(40, 80);
+            }
+        }
+
+        private string GetStatusText(ModerationStatus status)
+        {
+            switch (status)
+            {
+                case ModerationStatus.Safe:
+                    return "Сообщение безопасно";
+
+                case ModerationStatus.Blocked:
+                    return "Сообщение заблокировано";
+
+                default:
+                    return "Требуется проверка";
+            }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -210,6 +242,12 @@ namespace NeiroModerator
             lblCounter.Text = txtMessage.Text.Length + " / 500";
 
             ShowInitialState();
+        }
+
+        private void btnHistory_Click(object sender, EventArgs e)
+        {
+            using HistoryForm historyForm = new HistoryForm();
+            historyForm.ShowDialog();
         }
     }
 }
