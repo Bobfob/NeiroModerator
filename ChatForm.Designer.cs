@@ -1,6 +1,6 @@
 ﻿namespace NeiroModerator
 {
-    partial class Form1
+    partial class ChatForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             pnlMain = new Panel();
+            btnHistory = new Button();
+            lblCurrentUser = new Label();
             pnlResult = new Panel();
             pnlConfidence = new Panel();
             lblConfidence = new Label();
@@ -55,6 +57,8 @@
             // 
             // pnlMain
             // 
+            pnlMain.Controls.Add(btnHistory);
+            pnlMain.Controls.Add(lblCurrentUser);
             pnlMain.Controls.Add(pnlResult);
             pnlMain.Controls.Add(btnClear);
             pnlMain.Controls.Add(btnCheck);
@@ -70,6 +74,33 @@
             pnlMain.Name = "pnlMain";
             pnlMain.Size = new Size(936, 636);
             pnlMain.TabIndex = 0;
+            // 
+            // btnHistory
+            // 
+            btnHistory.BackColor = Color.FromArgb(25, 34, 56);
+            btnHistory.Cursor = Cursors.Hand;
+            btnHistory.FlatAppearance.BorderColor = Color.FromArgb(53, 65, 95);
+            btnHistory.FlatStyle = FlatStyle.Flat;
+            btnHistory.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            btnHistory.ForeColor = Color.FromArgb(198, 206, 224);
+            btnHistory.Location = new Point(448, 366);
+            btnHistory.Name = "btnHistory";
+            btnHistory.Size = new Size(150, 54);
+            btnHistory.TabIndex = 11;
+            btnHistory.Text = "История";
+            btnHistory.UseVisualStyleBackColor = false;
+            btnHistory.Click += this.btnHistory_Click;
+            // 
+            // lblCurrentUser
+            // 
+            lblCurrentUser.BackColor = Color.Transparent;
+            lblCurrentUser.ForeColor = Color.FromArgb(142, 154, 184);
+            lblCurrentUser.Location = new Point(650, 50);
+            lblCurrentUser.Name = "lblCurrentUser";
+            lblCurrentUser.Size = new Size(250, 24);
+            lblCurrentUser.TabIndex = 10;
+            lblCurrentUser.Text = "Пользователь: student";
+            lblCurrentUser.TextAlign = ContentAlignment.MiddleRight;
             // 
             // pnlResult
             // 
@@ -286,7 +317,7 @@
             picLogo.TabIndex = 0;
             picLogo.TabStop = false;
             // 
-            // Form1
+            // ChatForm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -296,7 +327,7 @@
             Font = new Font("Segoe UI", 10F);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
-            Name = "Form1";
+            Name = "ChatForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "AI-модератор сообщений";
             pnlMain.ResumeLayout(false);
@@ -330,5 +361,7 @@
         private Panel pnlConfidence;
         private Label lblConfidence;
         private Label lblConfidenceTitle;
+        private Label lblCurrentUser;
+        private Button btnHistory;
     }
 }
